@@ -3,8 +3,11 @@ from typing import List
 from core.models import ParsedEntities, TestPlan, TestStep
 
 BASE_SETUP_STEPS = [
+    TestStep(id="S0", section="Setup", description="Quick continuity check: GND vs +5V/+3V3 not shorted", equipment="DMM (diode/continuity)", expected="Rails not shorted to GND"),
     TestStep(id="S1", section="Setup", description="ESD precautions; connect board to bench PSU and GND mat.", equipment="ESD strap, bench PSU"),
     TestStep(id="S2", section="Setup", description="Connect DMM probes to common GND and designated test points.", equipment="DMM, probes"),
+    TestStep(id="S3", section="Setup", description="Set bench PSU to 5.0V and current limit to 200 mA; leave output disabled.", equipment="Bench PSU", expected="PSU configured 5.0V, 0.2A limit"),
+    TestStep(id="S4", section="Setup", description="Enable PSU; verify current draw ≤ 0.2A, else power off and stop.", equipment="Bench PSU, DMM", expected="Board stays below current limit"),
 ]
 
 
