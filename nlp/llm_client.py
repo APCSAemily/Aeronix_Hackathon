@@ -13,26 +13,35 @@ from nlp.prompting import SYSTEM_PROMPT, build_user_prompt
 
 
 def generate_plan_llm(entities: ParsedEntities) -> TestPlan:
-    """Attempt an LLM-enhanced plan; fall back to offline if no API key or client."""
+    """Generate base plan and enhance with LLM commentary."""
+    base = generate_plan_offline(entities)  # keep deterministic steps
     api_key = os.getenv("OPENAI_API_KEY")
-    if OpenAI is None or not api_key:
-        return generate_plan_offline(entities)
+    
+    try:
+        from openai import OpenAI
+    except Exception:
+        return base
+    
+    if not api_key:
+        return base
 
     client = OpenAI(api_key=api_key)
-    user_prompt = build_user_prompt(entities)
+    model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+    temperature = float(os.getenv("OPENAI_TEMPERATURE", "0.2"))
 
     try:
         resp = client.chat.completions.create(
-            model="gpt-4o-mini",
+            model=model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_prompt},
+                {"role": "user", "content": build_user_prompt(entities)
+                 + "\n\nImprove clarity and add short safety/DFT notes. Keep it concise."}
             ],
-            temperature=0.2,
+            temperature=temperature,
         )
         md = resp.choices[0].message.content or ""
-        # We return as a TestPlan with only Markdown notes (keep pipeline uniform)
-        return TestPlan(title=f"Bring-Up & Test Plan — {entities.title}", steps=[], notes=md)
+        base.notes = (base.notes or "") + "\n\nLLM Enhancements:\n" + md
+        return base
     except Exception:
-        # Any error -> offline deterministic plan
-        return generate_plan_offline(entities)
+        # Any error -> return base plan
+        return base
