@@ -11,6 +11,13 @@ except Exception:
 
 from nlp.prompting import SYSTEM_PROMPT, build_user_prompt
 
+try:
+    from storage.vectorstore import search_context_for_entities
+except ImportError:
+    # Fallback if storage module not available
+    def search_context_for_entities(entities_text: str) -> str:
+        return ""
+
 
 def generate_plan_llm(entities: ParsedEntities) -> TestPlan:
     """Generate base plan and enhance with LLM commentary."""
@@ -30,12 +37,21 @@ def generate_plan_llm(entities: ParsedEntities) -> TestPlan:
     temperature = float(os.getenv("OPENAI_TEMPERATURE", "0.2"))
 
     try:
+        # Get RAG context from library
+        entities_text = entities.model_dump_json()
+        context = search_context_for_entities(entities_text)
+        
+        # Build enhanced prompt with context
+        user_prompt = build_user_prompt(entities)
+        if context:
+            user_prompt += f"\n\nRelevant Context from Library:\n{context}"
+        user_prompt += "\n\nImprove clarity and add short safety/DFT notes. Keep it concise."
+        
         resp = client.chat.completions.create(
             model=model,
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": build_user_prompt(entities)
-                 + "\n\nImprove clarity and add short safety/DFT notes. Keep it concise."}
+                {"role": "user", "content": user_prompt}
             ],
             temperature=temperature,
         )
