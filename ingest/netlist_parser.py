@@ -29,9 +29,9 @@ def parse_netlist(netlist_path: str) -> ParsedEntities:
     for line in lines:
         if line.startswith(("327", "317")):
             parts = line.split()
-            if len(parts) >= 2:
-                net_name = parts[0]
-                component_ref = parts[1]
+            if len(parts) >= 3:
+                net_name = parts[1]  # Net name is the second field
+                component_ref = parts[2]  # Component ref is the third field
                 
                 if net_name not in nets:
                     nets[net_name] = []
