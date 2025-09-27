@@ -1,8 +1,10 @@
-# Hackathon Test Plan Generator
+# Aeronix Ignite Hackathon at UF
 
-A complete hardware bring-up/test plan generator with CLI and web interface.
+## Hackathon Test Plan Generator
 
-## Features
+A complete hardware bring-up/test plan generator with CLI and web interface, developed for the Aeronix Ignite Hackathon at University of Florida.
+
+### Features
 - CLI interface for batch processing
 - Streamlit web UI for interactive use
 - Netlist parser (IPC-D-356A format)
@@ -11,7 +13,7 @@ A complete hardware bring-up/test plan generator with CLI and web interface.
 - Optional LLM enhancement
 - Professional test plan generation
 
-## Quick Start
+### Quick Start
 ```bash
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
@@ -19,5 +21,18 @@ python -m app.cli examples/lora_entities.json --out out/testplan.md
 streamlit run app/web.py
 ```
 
-## License
+### Project Structure
+```
+hackathon-testplan/
+├── app/           # CLI and web interfaces
+├── core/          # Core models and generators
+├── ingest/        # File parsers (PDF, BOM, netlist)
+├── nlp/           # LLM integration
+├── rules/         # Validation and annotation
+├── examples/      # Sample data files
+├── tests/         # Test suite
+└── out/           # Generated test plans
+```
+
+### License
 MIT
