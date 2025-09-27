@@ -33,7 +33,7 @@ def _osc_steps(entities: ParsedEntities) -> List[TestStep]:
         hi = o.frequency_hz + o.tolerance_hz
         mhz = o.frequency_hz/1e6
         steps.append(TestStep(
-            id=f"F{idx}",
+            id=f"O{idx}",
             section="Oscillator Checks",
             description=f"Probe oscillator {o.ref}",
             equipment="Oscilloscope",
@@ -63,7 +63,8 @@ def generate_plan_offline(entities: ParsedEntities) -> TestPlan:
     steps.append(TestStep(id="V0", section="Visual Inspection", description="Check component orientation, solder bridges, missing parts.", equipment="Loupe", expected="IPC-610 Class 2 acceptable"))
     steps.extend(_voltage_steps(entities))
     steps.extend(_osc_steps(entities))
-    steps.append(TestStep(id="P1", section="Firmware Programming", description="Flash firmware and open serial console @115200 baud.", equipment="Programmer, USB cable", expected="Device boots without faults"))
+    steps.append(TestStep(id="P1", section="Firmware Programming", description="Flash firmware and open serial console @115200 baud.", equipment="Programmer, USB cable", expected="Device boots without faults; serial console opens at 115200 baud"))
     steps.extend(_functional_steps(entities))
+    steps.append(TestStep(id="C1", section="Close-out", description="Power-down and disconnect all equipment.", equipment="None", expected="Board safely powered off, all connections removed"))
     notes = "Generated offline via deterministic template. Review tolerances and test point references before lab use."
     return TestPlan(title=f"Bring-Up & Test Plan — {entities.title}", steps=steps, notes=notes)

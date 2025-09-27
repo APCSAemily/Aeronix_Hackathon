@@ -2,7 +2,6 @@
   "title": "Clemson LoRa Car Radio",
   "rails": [
     {"name": "PWR_JACK", "voltage": 5.0, "tolerance_mv": 100},
-    {"name": "+5V", "voltage": 5.0, "tolerance_mv": 100},
     {"name": "+3V3", "voltage": 3.3, "tolerance_mv": 100},
     {"name": "+3V3_RF", "voltage": 3.3, "tolerance_mv": 100}
   ],
